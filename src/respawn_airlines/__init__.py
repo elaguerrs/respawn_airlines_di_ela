@@ -1,5 +1,6 @@
 def main() -> None:
     import pygame
+    import random
     
     pygame.init()
     #inizializza i moudli pygame
@@ -41,7 +42,17 @@ def main() -> None:
     regolamento = False  #regolamento=True -> schermata del regolamento
     game = False  #gioco=True -> schermata del gioco
 
+    
+    # Carica l'immagine e crea quella sottosopra
+    imgPalazzo = pygame.image.load("imgPalazzo.png").convert_alpha()
+    
+    imgPalazzo = pygame.transform.scale(imgPalazzo, (150, 450)) 
+    imgPalazzoSopra = pygame.transform.flip(imgPalazzo, False, True)
 
+    # Variabili dei palazzi
+    palazzi = []
+    timer_palazzi = 0
+    
     while running:
 
         # posizione del mouse
@@ -139,6 +150,42 @@ def main() -> None:
                 aereo_y = altezza_schermo - 50
                 aereo_vel = 0
             
+            # Crea un rettangolo attorno all'aereo per vedere se tocca i palazzi
+            aereo_rect = pygame.Rect(aereo_x, aereo_y, 50, 20) 
+              
+                        # --- CREA I PALAZZI OGNI 90 MILLISECONDI ---
+            timer_palazzi += 1
+            if timer_palazzi > 90: 
+                buco_y = random.randint(120, 320) # Punto centrale del passaggio
+                
+                # Crea il rettangolo per il palazzo sopra e quello sotto
+                # (x, y, larghezza, altezza)
+                p_sopra = pygame.Rect(800, 0, 100, buco_y - 100)
+                p_sotto = pygame.Rect(800, buco_y + 100, 120, 448)
+                
+                palazzi.append(p_sopra)
+                palazzi.append(p_sotto)
+                timer_palazzi = 0
+
+            # --- MUOVI E DISEGNA I PALAZZI ---
+            for p in palazzi[:]:
+                p.x -= 5 # Sposta a sinistra
+
+                if p.y == 0: # Se il palazzo parte dall'alto
+                    screen.blit(imgPalazzoSopra, (p.x, p.bottom - 448))
+                else:        # Se il palazzo parte dal basso
+                    screen.blit(imgPalazzo, (p.x, p.top))
+                
+                # Se il palazzo esce dallo schermo, cancellalo dalla lista
+                if p.right < 0:
+                    palazzi.remove(p)
+
+                for p in palazzi:
+                    if aereo_rect.colliderect(p):
+                        game = False
+                        home = True
+                        palazzi.clear() # Svuota i palazzi per la prossima partita
+                        timer_palazzi = 0
     
 #       FINO A QUI è GIUSTO-> C'è DA MODIFICARE E METTERE PALAZZI
 
