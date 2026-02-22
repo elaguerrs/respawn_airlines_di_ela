@@ -3,6 +3,9 @@ def main() -> None:
     
     pygame.init()
     #inizializza i moudli pygame
+    
+    #controlla la velocità del gioco
+    clock = pygame.time.Clock()
 
     larghezza_schermo = 800
     altezza_schermo = 448
@@ -24,16 +27,28 @@ def main() -> None:
     buttonRect_reg = pygame.Rect(larghezza_schermo // 2 + 80, altezza_schermo - 100, 180, 60)
     textReg = font.render('Regolamento', True, "white")
     textRegRect = textReg.get_rect(center=buttonRect_reg.center)
+    
+    
+    #variabili aereo
+    aereo_x = 200
+    aereo_y = altezza_schermo // 2
+    aereo_vel = 0
+    gravity = 0.6
+    vel_max = 10
 
     running = True #fa funzionare il game loop
     home = True   #corrisponde alla schermata home
     regolamento = False  #regolamento=True -> schermata del regolamento
     game = False  #gioco=True -> schermata del gioco
 
+
     while running:
 
         # posizione del mouse
         mPos = pygame.mouse.get_pos()
+        
+        #regola la velocità del gioco
+        clock.tick(60)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -48,7 +63,11 @@ def main() -> None:
                         game = False
                     else:
                         #chiude il gioco se sei già nel menu
-                        running = False 
+                        running = False
+                
+                #se ci si ritrova nel gioco e si preme spazio l'aereo viene spinto verso l'alto
+                if event.key == pygame.K_SPACE and game: 
+                    aereo_vel = -11
                       
             #gestione pulsanti          
             if event.type == pygame.MOUSEBUTTONDOWN:          
@@ -86,19 +105,43 @@ def main() -> None:
         elif regolamento:
             screen.fill("darkred")                  #C'è DA FARE IL REGOLAMENTO VERO E PROPRIO SU QUESTA SCHERMATA 
         
-#         #opero nella schermata del gioco
-#         elif game:    #GIUSTO
-#              # Disegna lo sfondo del gioco
-#             screen.blit(imgSfondoGame, (0, 0))
-# 
-#     # Gravità e movimento aereo
-#         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-#             aereo_vel = -8  # spinta verso l'alto
-#             aereo_vel += gravità
-#             aereo_y += aereo_vel 
-#     # Disegna l'aereo
-#             screen.blit(imgAereo, (aereo_x, aereo_y))                                  #TUTTA STA ROBA NON FUNZIONA...C'è DA RIGUARDARLA
-# 
+        #opero nella schermata del gioco
+        elif game:    #GIUSTO
+            # Disegna lo sfondo del gioco
+            imgSfondoGame = pygame.image.load("imgSfondoGame.png")    #C'è DA SISTEMARE LO SFONDO + FAR PARTIRE L'AEREO DA PIù DIETRO????
+            imgSfondoGame = pygame.transform.scale(imgSfondoGame,(larghezza_schermo,altezza_schermo))
+            
+            screen.blit(imgSfondoGame, (0, 0))
+
+            # Gravità e movimento aereo
+            #aggiungo la gravità alla velocità dell'aereo 
+            aereo_vel += gravity
+            
+            #evita che la velocità aumenti a dismisura, arrivato a 10 l'aereo non aumenta la velocità
+            if aereo_vel > vel_max:
+                aereo_vel = vel_max
+            
+            #permette di far muovere l'aereo in base al fatto che vada verso su o giù
+            aereo_y+=aereo_vel
+                
+            # Disegna l'aereo
+            imgAereo = pygame.image.load("imgAereo.png") 
+            imgAereo = pygame.transform.scale(imgAereo,(150,100))
+            screen.blit(imgAereo, (aereo_x, aereo_y))
+            
+            #Gestisco i limiti dello schermo
+            #se l'aereo arriva sopra il margine in alto si ferma e scende per effetto di gravità
+            if aereo_y < 0:   
+                aereo_y = 0
+                aereo_vel = 0
+
+            if aereo_y > altezza_schermo - 50:  #ho messo 50 che è l'altezza dell'aereo
+                aereo_y = altezza_schermo - 50
+                aereo_vel = 0
+            
+    
+#       FINO A QUI è GIUSTO-> C'è DA MODIFICARE E METTERE PALAZZI
+
 #     # Movimento palazzi (ostacoli)
 #         for palazzo in palazzi:
 #             palazzo["x"] -= velocità_palazzi
@@ -110,8 +153,8 @@ def main() -> None:
 #                 game = False  # game over
 #     # Rimuovi palazzo se esce dallo schermo
 #             palazzi = [p for p in palazzi if p["x"] > -palazzo_larghezza]
-            
-
+#             
+# 
 #             if event.type == pygame.KEYDOWN:                             #SAREBBE DA INSERIRE SOTTO for event in pygame.event.get():
 #                 #se ci si ritrova nel gioco 
 #                 if event.key == pygame.K_SPACE and game:
