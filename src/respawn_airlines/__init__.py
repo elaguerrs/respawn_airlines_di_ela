@@ -108,7 +108,7 @@ def main() -> None:
         #opero nella schermata del gioco
         elif game:    #GIUSTO
             # Disegna lo sfondo del gioco
-            imgSfondoGame = pygame.image.load("imgSfondoGame.png")    #C'è DA SISTEMARE LO SFONDO + FAR PARTIRE L'AEREO DA PIù DIETRO????
+            imgSfondoGame = pygame.image.load("imgSfondoNY.png")    #C'è DA SISTEMARE LO SFONDO + FAR PARTIRE L'AEREO DA PIù DIETRO????
             imgSfondoGame = pygame.transform.scale(imgSfondoGame,(larghezza_schermo,altezza_schermo))
             
             screen.blit(imgSfondoGame, (0, 0))
