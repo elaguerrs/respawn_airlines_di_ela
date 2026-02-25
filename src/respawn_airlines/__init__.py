@@ -51,7 +51,9 @@ def main() -> None:
 
     # Variabili dei palazzi
     palazzi = []
+    antenne = []
     timer_palazzi = 0
+    timer_antenne = 0
     
     while running:
 
@@ -155,13 +157,16 @@ def main() -> None:
               
                         # --- CREA I PALAZZI OGNI 90 MILLISECONDI ---
             timer_palazzi += 1
-            if timer_palazzi > 90: 
+            timer_amntenne += 1
+            if timer_palazzi > 90 and timer_antenne > 90: 
                 buco_y = random.randint(120, 320) # Punto centrale del passaggio
                 
                 # Crea il rettangolo per il palazzo sopra e quello sotto
                 # (x, y, larghezza, altezza)
-                p_sopra = pygame.Rect(800, 0, 100, buco_y - 100)
-                p_sotto = pygame.Rect(800, buco_y + 100, 120, 448)
+                p_sopra = pygame.Rect(800, 0, 120, buco_y - 130)
+                p_sotto = pygame.Rect(800, buco_y + 130, 120, 448)
+                antenna_sopra = pygame.Rect(835, p_sopra.bottom, 30, 40) #il punto medio della base si trova a 850 ma l'antenna sarà larga 30, quindi 30/2 è 15, 850-15 è 835 
+                antenna_sotto = pygame.Rect(835, p_sotto.top - 40, 30, 40)
                 
                 palazzi.append(p_sopra)
                 palazzi.append(p_sotto)
@@ -175,17 +180,28 @@ def main() -> None:
                     screen.blit(imgPalazzoSopra, (p.x, p.bottom - 448))
                 else:        # Se il palazzo parte dal basso
                     screen.blit(imgPalazzo, (p.x, p.top))
+                    
+            for a in antenne[:]:
+                a.x -= 5 # Sposta a sinistra
+                
+
+                #bisogna ritagliare l'immagine del palazzo e dividerla tra il rettabgolo grande e quello dell'antenna
+                #chiamare l'immagine imgAntenna.jpg
+                #variabili antenna: a, antenna
+                
                 
                 # Se il palazzo esce dallo schermo, cancellalo dalla lista
                 if p.right < 0:
                     palazzi.remove(p)
 
                 for p in palazzi:
-                    if aereo_rect.colliderect(p):
+                    if aereo_rect.colliderect(p) or aereo_rect.colliderect(a):
                         game = False
                         home = True
+                        antenne.clear()
                         palazzi.clear() # Svuota i palazzi per la prossima partita
                         timer_palazzi = 0
+                        timer_antenne = 0
     
 #       FINO A QUI è GIUSTO-> C'è DA MODIFICARE E METTERE PALAZZI
 
